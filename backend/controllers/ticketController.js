@@ -64,7 +64,22 @@ const updateTicket =  asyncHandler(async(req,res,next)=>{
     res.send("update a ticket")
 });
 const deleteTicket =  asyncHandler(async(req,res,next)=>{
-    res.send("delete a ticket")
+    const user = await User.findById(req.user.id);
+    if(!user){
+        return next(new ErrorResponse('No User for this tickets',401));
+    }
+    //  look for ticket
+    const ticket = await Ticket.findById(req.params.id);
+    if(!ticket){
+        return next(new ErrorResponse(`No ticket found with ID ${req.params.id}`,404));
+    }
+    // check ownership for the ticket
+    if(ticket.user.toString() !== req.user.id){
+        return next(new ErrorResponse(`No Authorized`,401));
+    }
+    await ticket.remove();
+
+  res.status(200).json({ success: true })
 });
 
 module.exports ={
