@@ -1,4 +1,9 @@
-import {useState} from 'react'
+import {useState,useEffect} from 'react'
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import Spinner from '../components/Spinner';
+import { reset,login } from '../features/auth/authSlice';
 
 const Login = () => {
     
@@ -10,6 +15,9 @@ const Login = () => {
     // destructure formData
     const {email,password} = formData;
 
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+    const {user, isLoading, isError, isSuccess, message}=useSelector((state)=>state.auth);
     // setup input data
     const onChange = (e)=>{
         setFormData((prevState)=>({
@@ -18,12 +26,28 @@ const Login = () => {
         }))
     }
 
+    useEffect(() => {
+      if(isError){
+          toast.error(message);
+      }
+    //   if sucess or user redirect to home page
+    if(isSuccess || user){
+        navigate('/');
+    }
+    // dispatch(reset());
+    }, [user,isSuccess,isError,isLoading,message,navigate,dispatch]);
+    
+
     const onSubmit=(e)=>{
         e.preventDefault();
         const userData = {
             email,
             password
         }
+        dispatch(login(userData));
+    }
+    if(isLoading){
+        return <Spinner/>
     }
   return (
     <>
