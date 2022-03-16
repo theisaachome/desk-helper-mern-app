@@ -1,8 +1,12 @@
-import {useState} from 'react'
+import {useState,useEffect} from 'react'
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import Spinner from '../components/Spinner';
+import { register,reset } from '../features/auth/authSlice';
 
 const Register = () => {
-    // fields for register
+   // fields for register
     const [formData, setFormData] = useState({
         username:"",
         email:"",
@@ -20,6 +24,21 @@ const Register = () => {
             [e.target.name]:e.target.value
         }));
     }
+      // redux 
+      const dispatch = useDispatch();
+      const navigate = useNavigate();
+      const { user, isLoading, isError, isSuccess, message } = useSelector((state)=>state.auth);
+     useEffect(() => {
+       if(isError){
+           toast.error(message);
+       }
+        // Redirect when logged in
+    if (isSuccess || user) {
+        navigate('/')
+      }
+      dispatch(reset())
+     }, [user,isLoading,isError,isSuccess,message,dispatch,navigate]);
+     
     // send data to server
     const onSubmit=(e)=>{
         e.preventDefault();
@@ -33,8 +52,11 @@ const Register = () => {
                 password,
             }
             // send data
-            console.log(userData);
+            dispatch(register(userData));
         }
+    }
+    if(isLoading){
+        return <Spinner/>
     }
 
   return (
