@@ -1,7 +1,9 @@
 function Spinner() {
     return (
       <div className='loadingSpinnerContainer'>
-        <div className='loadingSpipnner'></div>
+        <div className='loadingSpipnner'>
+          loading
+        </div>
       </div>
     )
   }
